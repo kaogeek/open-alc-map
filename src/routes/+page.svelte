@@ -1,2 +1,8 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<script lang="ts">
+	import Map from '../components/Map.svelte';
+</script>
+
+<h1>Open Alcohol Map</h1>
+
+<!-- <svelte:component this={SVG} /> -->
+<Map />
