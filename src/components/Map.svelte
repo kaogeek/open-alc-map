@@ -2,17 +2,31 @@
 <!-- This map is based on the work of MapSVG (https://mapsvg.com). -->
 
 <script lang="ts">
-	import panzoom from 'panzoom';
+	import panzoom, { type PanZoom } from 'panzoom';
+	import { onDestroy, onMount } from 'svelte';
 
 	let svg: SVGElement;
+	let panzoomInstance: PanZoom;
 
-	$: if (svg) {
-		panzoom(svg);
-	}
+	onMount(() => {
+		panzoomInstance = panzoom(svg);
+
+		document.querySelectorAll('#map path').forEach((path) => {
+			path.addEventListener('click', (e) => {
+				const el = e.target as SVGElement;
+				alert(`You clicked: ${el.getAttribute('name')}`);
+			});
+		});
+	});
+
+	onDestroy(() => {
+		panzoomInstance?.dispose();
+	});
 </script>
 
 <div class="container mx-auto h-full overflow-hidden border">
 	<svg
+		id="map"
 		xmlns="http://www.w3.org/2000/svg"
 		fill="lightgray"
 		viewBox="0 0 560 1025"
