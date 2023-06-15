@@ -9,13 +9,18 @@
 	let panzoomInstance: PanZoom;
 
 	onMount(() => {
-		panzoomInstance = panzoom(svg);
+		panzoomInstance = panzoom(svg, {
+			onClick: (e) => {
+				e.preventDefault();
 
-		document.querySelectorAll('#map path').forEach((path) => {
-			path.addEventListener('click', (e) => {
+				// Handle only path elements
+
 				const el = e.target as SVGElement;
+
+				if (el.tagName !== 'path') return;
+
 				alert(`You clicked: ${el.getAttribute('name')}`);
-			});
+			}
 		});
 	});
 

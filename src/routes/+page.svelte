@@ -4,6 +4,6 @@
 
 <!-- <svelte:component this={SVG} /> -->
 <main class="bg-blue-200 h-[100svh]">
-	<h1>Open Alcohol Map</h1>
+	<h1>Open Alcohol Map (Work in progress)</h1>
 	<Map />
 </main>
