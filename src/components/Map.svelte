@@ -4,9 +4,91 @@
 <script lang="ts">
 	import panzoom, { type PanZoom } from 'panzoom';
 	import { onDestroy, onMount } from 'svelte';
+	import mapData from './data.json';
 
 	let svg: SVGElement;
 	let panzoomInstance: PanZoom;
+	let imgEl: SVGImageElement[] = [];
+
+	const images = ['/images/suntree.jpg', '/images/sunny-full.png'];
+
+	const entries = [
+		{
+			name: 'Suntree',
+			image: '/images/suntree.jpg',
+			province: 'bkk',
+			x: -100,
+			y: -100
+		},
+		{
+			name: 'Kilo Spirits',
+			image: '/images/kilo-spirits.jpg',
+			province: 'kbi',
+			x: -100,
+			y: -100
+		},
+		{
+			name: 'Gulve Fruit Wine',
+			image: '/images/gulve-fruit-wine.jpg',
+			province: 'cti',
+			x: -100,
+			y: -100
+		},
+		{
+			name: 'The Spirit of Chaiyaphum',
+			image: '/images/the-spirit-of-chaiyaphum.jpg',
+			province: 'cpm',
+			x: -100,
+			y: -100
+		},
+		{
+			name: 'Maa Jai Dum',
+			image: '/images/maajaidum.jpg',
+			province: 'cmi',
+			x: -100,
+			y: -100
+		},
+		{
+			name: 'Koyote Lumka',
+			image: '/images/koyote-lumka.jpg',
+			province: 'cmi',
+			x: -100,
+			y: -100
+		},
+		{
+			name: 'Asura',
+			image: '/images/asura.jpg',
+			province: 'cmi',
+			x: -100,
+			y: -100
+		},
+		{
+			name: 'Lanna Thai Spirit',
+			image: '/images/lanna-thai-spirit.jpg',
+			province: 'cmi',
+			x: -100,
+			y: -100
+		},
+		{
+			name: 'Saku',
+			image: '/images/saku.jpg',
+			province: 'nma',
+			x: -100,
+			y: -100
+		},
+		{
+			name: 'Callmepapa',
+			image: '/images/callmepapa.jpg',
+			province: 'nbi',
+			x: -100,
+			y: -100
+		}
+	].map((entry) => {
+		entry['x'] = mapData[entry.province as keyof typeof mapData].x;
+		entry['y'] = mapData[entry.province as keyof typeof mapData].y;
+
+		return entry;
+	});
 
 	onMount(() => {
 		panzoomInstance = panzoom(svg, {
@@ -15,13 +97,36 @@
 
 				// Handle only path elements
 
-				const el = e.target as SVGElement;
+				const el = e.target as SVGPathElement;
 
 				if (el.tagName !== 'path') return;
 
-				alert(`You clicked: ${el.getAttribute('name')}`);
+				// alert(`You clicked: ${el.getAttribute('name')}`);
+
+				// const bounds = el.getBoundingClientRect();
+				const bounds = el.getBBox();
+
+				const midX = bounds.x + bounds.width / 2;
+				const midY = bounds.y + bounds.height / 2;
+
+				console.log(midX, midY);
 			}
 		});
+
+		console.log(imgEl);
+		let data: Record<string, { x: number; y: number }> = {};
+		document.querySelectorAll<SVGPathElement>('#map path').forEach((path) => {
+			// Get middle point of each path
+			const bounds = path.getBBox();
+			const midX = bounds.x + bounds.width / 2;
+			const midY = bounds.y + bounds.height / 2;
+
+			console.log(path.getAttribute('name'), midX, midY);
+
+			// data[path.getAttribute('id')!] = { x: midX, y: midY, w: bounds.width, h: bounds.height };
+		});
+
+		console.log({ data });
 	});
 
 	onDestroy(() => {
@@ -578,13 +683,47 @@
 				stroke="gray"
 				stroke-width="0.5"
 			/>
-			<path
+			<!-- <path
 				id="lksg"
 				name="Lake Songkha"
 				d="m 192.78844,878.51255 0.63,-0.52 1.87,0.44 0.84,-0.25 1.05,-1.09 0,0 0.89,-0.25 1.78,3.5 1.04,7.82 0,0 -0.72,3.13 0,0 -0.4,0.31 -1.11,-0.75 0,0 -0.67,1.64 -1,0.94 0.54,2.52 1.3,0.96 0.16,-1.57 1.85,-3.33 2.38,-0.06 2.44,1.08 1.29,6.08 -0.44,6.27 1.36,1.28 -0.06,2.73 0.46,0.78 0.06,1.8 -1.34,0.88 1.94,1.25 0,0 -1.39,0.66 0,0 1.08,-0.51 -3.44,-1.8 -0.54,-1.85 0,0 -0.01,-0.19 0,0 0.01,-0.49 0,0 -0.09,-0.28 0,0 -1.43,-1.88 -1.08,-0.04 -0.92,-0.6 -0.93,1.02 -0.81,0.03 -0.04,-1 -1.83,-1.99 -1.04,-0.47 -0.27,-1.49 -1.88,-3.8 0.15,-2.05 -0.76,0.7 -0.74,-0.21 -1.91,-1.93 -1.75,-8.49 -0.22,-5.6 3.01,-2.08 0.69,-1.25 z m 11.06,19.37 0,0 -2,0.43 0.3,1.38 -0.37,2.44 0.4,-0.39 0.41,0.6 -0.24,0.48 -0.92,-0.13 -0.59,3.37 0.22,0.87 1.68,0.17 -0.16,-3.02 1.03,-0.47 0.48,-2.12 -0.26,-1.52 -0.63,0.17 -0.39,-1.24 0.28,-0.5 1.29,-0.13 0.56,-1.17 -0.75,-0.05 -0.34,0.83 z m 0.87,11.14 0,0 0.31,-0.34 0.29,3.25 0.92,0.48 0.46,-0.27 1.07,-0.49 0.15,-1.45 -2.1,-1.74 0.28,-0.8 -0.55,-3.87 0,0 -0.6,-0.07 0,0 -1.35,1.11 0.13,0.74 -0.8,1.53 1.55,1.79 0,0 0.24,0.13 z"
 				stroke="gray"
 				stroke-width="0.5"
-			/>
+			/> -->
+
+			<!-- {#each images as image, idx}
+				<image
+					bind:this={imgEl[idx]}
+					href={image}
+					x="194.39342498779297"
+					y="482.9575500488281"
+					width="30"
+					height="30"
+					transform="translate(-15, -15)"
+				/>
+			{/each} -->
+
+			<!-- {#each entries as entry, idx}
+				<image
+					bind:this={imgEl[idx]}
+					href={entry.image}
+					x={entry.x}
+					y={entry.y}
+					width="30"
+					height="30"
+					transform="translate(-15, -15)"
+				/>
+			{/each} -->
+
+			{#each Object.entries(mapData) as [id, { x, y, w, h }]}
+				<foreignObject x={x - w / 2} y={y - h / 2} width={w} height={h} class="overflow-visible">
+					<div class="w-full h-full grid auto-rows-max gap-1 place-content-center">
+						{#each entries.filter((entry) => entry.province === id) as entry, idx}
+							<img alt={entry.name} src={entry.image} class="max-w-[36px]" />
+						{/each}
+					</div>
+				</foreignObject>
+			{/each}
 		</g>
 	</svg>
 </div>
