@@ -4,13 +4,18 @@
 <script lang="ts">
 	import panzoom, { type PanZoom } from 'panzoom';
 	import { onDestroy, onMount } from 'svelte';
+	import * as d3 from 'd3';
+
 	import mapData from './data.json';
 
 	let svg: SVGElement;
 	let panzoomInstance: PanZoom;
 	let imgEl: SVGImageElement[] = [];
+	let provinces: Record<string, SVGCircleElement> = {};
+	let links: Array<{ x1: number; y1: number; x2: number; y2: number }> = [];
 
 	const images = ['/images/suntree.jpg', '/images/sunny-full.png'];
+	$: console.log({ provinces });
 
 	const entries = [
 		{
@@ -89,6 +94,54 @@
 
 		return entry;
 	});
+
+	$: if (Object.entries(provinces).length) {
+		console.log({ provinces, entries });
+		links = [];
+		// Add links to each entry within the province
+		Object.entries(provinces).forEach(([provinceId, el]) => {
+			console.log({ provinceId });
+
+			const entriesInProvince = entries.filter((entry) => entry.province === provinceId);
+
+			if (entriesInProvince.length) {
+				entriesInProvince.forEach((entry) => {
+					links = [
+						...links,
+						{
+							x1: entry.x,
+							y1: entry.y,
+							x2: entry.x + 30,
+							y2: entry.y + 30
+						}
+					];
+				});
+
+				// const g = d3.select(el).append('g');
+				// entriesInProvince.forEach((entry) => {
+				// 	// const link = g.append('a').attr('href', entry.image).attr('target', '_blank');
+				// 	const link = g;
+				// 	link
+				// 		.append('circle')
+				// 		.attr('cx', entry.x)
+				// 		.attr('cy', entry.y)
+				// 		.attr('r', 10)
+				// 		.attr('fill', 'red');
+				// 	link
+				// 		.append('text')
+				// 		.attr('x', entry.x)
+				// 		.attr('y', entry.y)
+				// 		.attr('text-anchor', 'middle')
+				// 		.attr('font-size', '10px')
+				// 		.attr('fill', 'white')
+				// 		.text(entry.name);
+				// 	linkTemp.push(link);
+				// });
+			}
+		});
+
+		// links = [...linkTemp];
+	}
 
 	onMount(() => {
 		panzoomInstance = panzoom(svg, {
@@ -715,7 +768,7 @@
 				/>
 			{/each} -->
 
-			{#each Object.entries(mapData) as [id, { x, y, w, h }]}
+			<!-- {#each Object.entries(mapData) as [id, { x, y, w, h }]}
 				<foreignObject x={x - w / 2} y={y - h / 2} width={w} height={h} class="overflow-visible">
 					<div class="w-full h-full grid auto-rows-max gap-1 place-content-center">
 						{#each entries.filter((entry) => entry.province === id) as entry, idx}
@@ -723,6 +776,25 @@
 						{/each}
 					</div>
 				</foreignObject>
+			{/each} -->
+
+			{#each Object.entries(mapData) as [id, { x, y, w, h }]}
+				<circle
+					bind:this={provinces[id]}
+					cx={x}
+					cy={y}
+					r={3}
+					fill="transparent"
+					stroke="blue"
+					stroke-width="2"
+					on:click={() => {
+						console.log(id);
+					}}
+				/>
+			{/each}
+
+			{#each links as link}
+				<line stroke="red" stroke-width="2" x1={link.x1} y1={link.y1} x2={link.x2} y2={link.y2} />
 			{/each}
 		</g>
 	</svg>
