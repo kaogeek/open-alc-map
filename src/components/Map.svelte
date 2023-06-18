@@ -12,7 +12,21 @@
 	let panzoomInstance: PanZoom;
 	let imgEl: SVGImageElement[] = [];
 	let provinces: Record<string, SVGCircleElement> = {};
-	let links: Array<{ x1: number; y1: number; x2: number; y2: number }> = [];
+	let links: Array<{
+		x1: number;
+		y1: number;
+		x2: number;
+		y2: number;
+		source: string;
+		target: string;
+	}> = [];
+	let simulation: d3.Simulation<
+		{
+			id: string;
+			index: number;
+		},
+		undefined
+	>;
 
 	const images = ['/images/suntree.jpg', '/images/sunny-full.png'];
 	$: console.log({ provinces });
@@ -112,7 +126,9 @@
 							x1: entry.x,
 							y1: entry.y,
 							x2: entry.x + 30,
-							y2: entry.y + 30
+							y2: entry.y + 30,
+							source: entry.province,
+							target: entry.name
 						}
 					];
 				});
@@ -141,6 +157,54 @@
 		});
 
 		// links = [...linkTemp];
+		// Create a simulation with several forces.
+		const forceProvinceNodes = Object.entries(provinces).map(([id, province], idx) => {
+			return { id: id, index: idx };
+		});
+		const forceBrandNodes = entries.map((entry, idx) => {
+			return { id: entry.name, index: idx };
+		});
+		const forceLinks = links.map((link) => ({ ...link }));
+
+		simulation = d3
+			.forceSimulation([...forceProvinceNodes, ...forceBrandNodes])
+			.force(
+				'link',
+				d3.forceLink(forceLinks).id((d) => d.id)
+			)
+			.force('charge', d3.forceManyBody())
+			// .force('center', d3.forceCenter(width / 2, height / 2))
+			.on('tick', simulationTicked);
+	}
+
+	function simulationTicked() {
+		console.log('simulationTicked');
+		const nodes = simulation.nodes();
+
+		links = links.map((link) => {
+			const source = nodes.find((node) => node.id === link.source)!;
+			const target = nodes.find((node) => node.id === link.target)!;
+
+			return {
+				...link,
+				x1: source.x,
+				y1: source.y,
+				x2: target.x,
+				y2: target.y
+			};
+		});
+
+		//   simulation.on("tick", () => {
+		//   link
+		//       .attr("x1", d => d.source.x)
+		//       .attr("y1", d => d.source.y)
+		//       .attr("x2", d => d.target.x)
+		//       .attr("y2", d => d.target.y);
+
+		//   node
+		//       .attr("cx", d => d.x)
+		//       .attr("cy", d => d.y);
+		// });
 	}
 
 	onMount(() => {
