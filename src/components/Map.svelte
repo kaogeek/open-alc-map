@@ -12,24 +12,21 @@
 	let panzoomInstance: PanZoom;
 	let imgEl: SVGImageElement[] = [];
 	let provinces: Record<string, SVGCircleElement> = {};
-	let links: Array<{
-		x1: number;
-		y1: number;
-		x2: number;
-		y2: number;
-		source: string;
-		target: string;
-	}> = [];
-	let simulation: d3.Simulation<
-		{
-			id: string;
-			index: number;
-		},
-		undefined
-	>;
 
-	const images = ['/images/suntree.jpg', '/images/sunny-full.png'];
-	$: console.log({ provinces });
+	interface NodeDatum extends d3.SimulationNodeDatum {
+		id: string;
+		x: number;
+		y: number;
+		fx?: number;
+		fy?: number;
+	}
+
+	interface LinkDatum extends d3.SimulationLinkDatum<NodeDatum> {
+		source: string | NodeDatum;
+		target: string | NodeDatum;
+	}
+
+	let simulation: d3.Simulation<NodeDatum, LinkDatum>;
 
 	const entries = [
 		{
@@ -109,105 +106,76 @@
 		return entry;
 	});
 
-	$: if (Object.entries(provinces).length) {
-		console.log({ provinces, entries });
-		links = [];
-		// Add links to each entry within the province
-		Object.entries(provinces).forEach(([provinceId, el]) => {
-			console.log({ provinceId });
+	let nodes: NodeDatum[] = [
+		{
+			id: 'main',
+			x: 221,
+			y: 472,
+			fx: 221,
+			fy: 472
+		},
+		{
+			id: 'branch',
+			x: 221,
+			y: 472
+		},
+		{
+			id: 'branch2',
+			x: 221,
+			y: 472
+		},
+		{
+			id: 'branch3',
+			x: 221,
+			y: 472
+		},
+		{
+			id: 'branch4',
+			x: 221,
+			y: 472
+		}
+	];
 
-			const entriesInProvince = entries.filter((entry) => entry.province === provinceId);
+	let links: LinkDatum[] = [
+		{
+			source: 'main',
+			target: 'branch'
+		},
+		{
+			source: 'main',
+			target: 'branch2'
+		},
+		{
+			source: 'main',
+			target: 'branch3'
+		},
+		{
+			source: 'main',
+			target: 'branch4'
+		}
+	];
 
-			if (entriesInProvince.length) {
-				entriesInProvince.forEach((entry) => {
-					links = [
-						...links,
-						{
-							x1: entry.x,
-							y1: entry.y,
-							x2: entry.x + 30,
-							y2: entry.y + 30,
-							source: entry.province,
-							target: entry.name
-						}
-					];
-				});
-
-				// const g = d3.select(el).append('g');
-				// entriesInProvince.forEach((entry) => {
-				// 	// const link = g.append('a').attr('href', entry.image).attr('target', '_blank');
-				// 	const link = g;
-				// 	link
-				// 		.append('circle')
-				// 		.attr('cx', entry.x)
-				// 		.attr('cy', entry.y)
-				// 		.attr('r', 10)
-				// 		.attr('fill', 'red');
-				// 	link
-				// 		.append('text')
-				// 		.attr('x', entry.x)
-				// 		.attr('y', entry.y)
-				// 		.attr('text-anchor', 'middle')
-				// 		.attr('font-size', '10px')
-				// 		.attr('fill', 'white')
-				// 		.text(entry.name);
-				// 	linkTemp.push(link);
-				// });
-			}
-		});
-
-		// links = [...linkTemp];
-		// Create a simulation with several forces.
-		const forceProvinceNodes = Object.entries(provinces).map(([id, province], idx) => {
-			return { id: id, index: idx };
-		});
-		const forceBrandNodes = entries.map((entry, idx) => {
-			return { id: entry.name, index: idx };
-		});
-		const forceLinks = links.map((link) => ({ ...link }));
-
-		simulation = d3
-			.forceSimulation([...forceProvinceNodes, ...forceBrandNodes])
-			.force(
-				'link',
-				d3.forceLink(forceLinks).id((d) => d.id)
-			)
-			.force('charge', d3.forceManyBody())
-			// .force('center', d3.forceCenter(width / 2, height / 2))
-			.on('tick', simulationTicked);
+	function isNodeObject<T>(node: number | string | T): node is T {
+		return typeof node !== 'number' && typeof node !== 'string';
 	}
 
-	function simulationTicked() {
-		console.log('simulationTicked');
-		const nodes = simulation.nodes();
-
-		links = links.map((link) => {
-			const source = nodes.find((node) => node.id === link.source)!;
-			const target = nodes.find((node) => node.id === link.target)!;
-
-			return {
-				...link,
-				x1: source.x,
-				y1: source.y,
-				x2: target.x,
-				y2: target.y
-			};
-		});
-
-		//   simulation.on("tick", () => {
-		//   link
-		//       .attr("x1", d => d.source.x)
-		//       .attr("y1", d => d.source.y)
-		//       .attr("x2", d => d.target.x)
-		//       .attr("y2", d => d.target.y);
-
-		//   node
-		//       .attr("cx", d => d.x)
-		//       .attr("cy", d => d.y);
-		// });
+	function simulationUpdate() {
+		simulation.tick();
+		nodes = [...nodes];
+		links = [...links];
 	}
 
 	onMount(() => {
+		simulation = d3.forceSimulation(nodes);
+
+		simulation
+			.force(
+				'link',
+				d3.forceLink(links).id((d: any) => d.id)
+			)
+			.force('charge', d3.forceManyBody())
+			.on('tick', simulationUpdate);
+
 		panzoomInstance = panzoom(svg, {
 			onClick: (e) => {
 				e.preventDefault();
@@ -800,13 +768,6 @@
 				stroke="gray"
 				stroke-width="0.5"
 			/>
-			<!-- <path
-				id="lksg"
-				name="Lake Songkha"
-				d="m 192.78844,878.51255 0.63,-0.52 1.87,0.44 0.84,-0.25 1.05,-1.09 0,0 0.89,-0.25 1.78,3.5 1.04,7.82 0,0 -0.72,3.13 0,0 -0.4,0.31 -1.11,-0.75 0,0 -0.67,1.64 -1,0.94 0.54,2.52 1.3,0.96 0.16,-1.57 1.85,-3.33 2.38,-0.06 2.44,1.08 1.29,6.08 -0.44,6.27 1.36,1.28 -0.06,2.73 0.46,0.78 0.06,1.8 -1.34,0.88 1.94,1.25 0,0 -1.39,0.66 0,0 1.08,-0.51 -3.44,-1.8 -0.54,-1.85 0,0 -0.01,-0.19 0,0 0.01,-0.49 0,0 -0.09,-0.28 0,0 -1.43,-1.88 -1.08,-0.04 -0.92,-0.6 -0.93,1.02 -0.81,0.03 -0.04,-1 -1.83,-1.99 -1.04,-0.47 -0.27,-1.49 -1.88,-3.8 0.15,-2.05 -0.76,0.7 -0.74,-0.21 -1.91,-1.93 -1.75,-8.49 -0.22,-5.6 3.01,-2.08 0.69,-1.25 z m 11.06,19.37 0,0 -2,0.43 0.3,1.38 -0.37,2.44 0.4,-0.39 0.41,0.6 -0.24,0.48 -0.92,-0.13 -0.59,3.37 0.22,0.87 1.68,0.17 -0.16,-3.02 1.03,-0.47 0.48,-2.12 -0.26,-1.52 -0.63,0.17 -0.39,-1.24 0.28,-0.5 1.29,-0.13 0.56,-1.17 -0.75,-0.05 -0.34,0.83 z m 0.87,11.14 0,0 0.31,-0.34 0.29,3.25 0.92,0.48 0.46,-0.27 1.07,-0.49 0.15,-1.45 -2.1,-1.74 0.28,-0.8 -0.55,-3.87 0,0 -0.6,-0.07 0,0 -1.35,1.11 0.13,0.74 -0.8,1.53 1.55,1.79 0,0 0.24,0.13 z"
-				stroke="gray"
-				stroke-width="0.5"
-			/> -->
 
 			<!-- {#each images as image, idx}
 				<image
@@ -858,7 +819,19 @@
 			{/each}
 
 			{#each links as link}
-				<line stroke="red" stroke-width="2" x1={link.x1} y1={link.y1} x2={link.x2} y2={link.y2} />
+				<g stroke="#999" stroke-opacity="0.6">
+					{#if isNodeObject(link.source) && isNodeObject(link.target)}
+						<line x1={link.source.x} y1={link.source.y} x2={link.target.x} y2={link.target.y}>
+							<title>{link.source.id}</title>
+						</line>
+					{/if}
+				</g>
+			{/each}
+
+			{#each nodes as point}
+				<circle class="node" r="5" fill={'red'} cx={point.x} cy={point.y}>
+					<title>{point.id}</title></circle
+				>
 			{/each}
 		</g>
 	</svg>
