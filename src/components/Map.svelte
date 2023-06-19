@@ -19,6 +19,7 @@
 		y: number;
 		fx?: number;
 		fy?: number;
+		group: 'province' | 'brand';
 	}
 
 	interface LinkDatum extends d3.SimulationLinkDatum<NodeDatum> {
@@ -107,52 +108,39 @@
 	});
 
 	let nodes: NodeDatum[] = [
-		{
-			id: 'main',
-			x: 221,
-			y: 472,
-			fx: 221,
-			fy: 472
-		},
-		{
-			id: 'branch',
-			x: 221,
-			y: 472
-		},
-		{
-			id: 'branch2',
-			x: 221,
-			y: 472
-		},
-		{
-			id: 'branch3',
-			x: 221,
-			y: 472
-		},
-		{
-			id: 'branch4',
-			x: 221,
-			y: 472
-		}
+		...entries.map((entry) => {
+			return {
+				id: entry.name,
+				x: entry.x,
+				y: entry.y,
+				group: 'brand'
+			} satisfies NodeDatum;
+		}),
+		...Object.entries(mapData)
+			.filter(([provinceId, _]) => {
+				// Filter only province that has a brand
+				return entries.some((entry) => entry.province === provinceId);
+			})
+			.map(([provinceId, entry]) => {
+				return {
+					id: provinceId,
+					x: entry.x,
+					y: entry.y,
+					fx: entry.x,
+					fy: entry.y,
+					group: 'province'
+				} satisfies NodeDatum;
+			})
 	];
 
 	let links: LinkDatum[] = [
-		{
-			source: 'main',
-			target: 'branch'
-		},
-		{
-			source: 'main',
-			target: 'branch2'
-		},
-		{
-			source: 'main',
-			target: 'branch3'
-		},
-		{
-			source: 'main',
-			target: 'branch4'
-		}
+		// Links every brand to its province
+		...entries.map((entry) => {
+			return {
+				source: entry.province,
+				target: entry.name
+			} satisfies LinkDatum;
+		})
 	];
 
 	function isNodeObject<T>(node: number | string | T): node is T {
@@ -171,7 +159,22 @@
 		simulation
 			.force(
 				'link',
-				d3.forceLink(links).id((d: any) => d.id)
+				d3
+					.forceLink(links)
+					.id((d: any) => d.id)
+					.distance((link) => {
+						if (isNodeObject(link.source) && isNodeObject(link.target)) {
+							// If source province has only 1 brand, return 0
+							if (
+								links.filter((l) => (l.source as NodeDatum).id === (link.source as NodeDatum).id)
+									.length === 1
+							) {
+								return 0;
+							}
+						}
+
+						return 30;
+					})
 			)
 			.force('charge', d3.forceManyBody())
 			.on('tick', simulationUpdate);
@@ -803,7 +806,7 @@
 				</foreignObject>
 			{/each} -->
 
-			{#each Object.entries(mapData) as [id, { x, y, w, h }]}
+			<!-- {#each Object.entries(mapData) as [id, { x, y, w, h }]}
 				<circle
 					bind:this={provinces[id]}
 					cx={x}
@@ -816,7 +819,7 @@
 						console.log(id);
 					}}
 				/>
-			{/each}
+			{/each} -->
 
 			{#each links as link}
 				<g stroke="#999" stroke-opacity="0.6">
@@ -828,9 +831,15 @@
 				</g>
 			{/each}
 
-			{#each nodes as point}
-				<circle class="node" r="5" fill={'red'} cx={point.x} cy={point.y}>
-					<title>{point.id}</title></circle
+			{#each nodes as node}
+				<circle
+					class="node"
+					r="5"
+					fill={node.group == 'brand' ? 'red' : 'transparent'}
+					cx={node.x}
+					cy={node.y}
+				>
+					<title>{node.id}</title></circle
 				>
 			{/each}
 		</g>
