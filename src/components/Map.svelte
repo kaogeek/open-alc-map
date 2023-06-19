@@ -148,9 +148,15 @@
 	}
 
 	function simulationUpdate() {
-		simulation.tick();
+		// simulation.tick();
 		nodes = [...nodes];
 		links = [...links];
+	}
+
+	function getBrandImage(name: string) {
+		const entry = entries.find((entry) => entry.name === name);
+
+		return entry ? entry.image : '';
 	}
 
 	onMount(() => {
@@ -177,6 +183,10 @@
 					})
 			)
 			.force('charge', d3.forceManyBody())
+			// .force(
+			// 	'collide',
+			// 	d3.forceCollide(() => 10)
+			// )
 			.on('tick', simulationUpdate);
 
 		panzoomInstance = panzoom(svg, {
@@ -772,18 +782,6 @@
 				stroke-width="0.5"
 			/>
 
-			<!-- {#each images as image, idx}
-				<image
-					bind:this={imgEl[idx]}
-					href={image}
-					x="194.39342498779297"
-					y="482.9575500488281"
-					width="30"
-					height="30"
-					transform="translate(-15, -15)"
-				/>
-			{/each} -->
-
 			<!-- {#each entries as entry, idx}
 				<image
 					bind:this={imgEl[idx]}
@@ -822,9 +820,16 @@
 			{/each} -->
 
 			{#each links as link}
-				<g stroke="#999" stroke-opacity="0.6">
+				<g stroke="#444" stroke-opacity="0.6">
 					{#if isNodeObject(link.source) && isNodeObject(link.target)}
-						<line x1={link.source.x} y1={link.source.y} x2={link.target.x} y2={link.target.y}>
+						<line
+							x1={link.source.x}
+							y1={link.source.y}
+							x2={link.target.x}
+							y2={link.target.y}
+							stroke-dasharray="4"
+							stroke-width="2"
+						>
 							<title>{link.source.id}</title>
 						</line>
 					{/if}
@@ -832,15 +837,18 @@
 			{/each}
 
 			{#each nodes as node}
-				<circle
-					class="node"
-					r="5"
-					fill={node.group == 'brand' ? 'red' : 'transparent'}
-					cx={node.x}
-					cy={node.y}
-				>
-					<title>{node.id}</title></circle
-				>
+				{#if node.group == 'brand'}
+					<image
+						href={getBrandImage(node.id)}
+						x={node.x - 20}
+						y={node.y - 20}
+						width="40"
+						height="40"
+					/>
+				{/if}
+				<!-- <circle class="node" r="30" cx={node.x} cy={node.y}>
+					<title>{node.id}</title>
+				</circle> -->
 			{/each}
 		</g>
 	</svg>
