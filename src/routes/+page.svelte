@@ -3,7 +3,7 @@
 </script>
 
 <!-- <svelte:component this={SVG} /> -->
-<main class="bg-blue-200 h-[100svh]">
-	<h1>Open Alcohol Map (Work in progress)</h1>
+<main class="bg-blue-200 h-[100svh] relative">
+	<h1 class="absolute top-8 left-8 font-sans text-2xl font-bold">Open Alcohol Map</h1>
 	<Map />
 </main>

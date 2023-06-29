@@ -233,7 +233,7 @@
 	});
 </script>
 
-<div class="container mx-auto h-full overflow-hidden border">
+<div class="w-full h-full overflow-hidden">
 	<svg
 		id="map"
 		xmlns="http://www.w3.org/2000/svg"
@@ -242,7 +242,7 @@
 		aria-label="Map of Thailand"
 		class="w-full h-full"
 	>
-		<g bind:this={svg} class="h-full mx-auto">
+		<g bind:this={svg} class="h-full">
 			<Paths />
 
 			{#each links as link}
