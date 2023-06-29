@@ -5,9 +5,11 @@
 	import panzoom, { type PanZoom } from 'panzoom';
 	import { onDestroy, onMount } from 'svelte';
 	import * as d3 from 'd3';
+	import { parse } from 'yaml';
 
 	import mapData from './data.json';
 	import Paths from './Paths.svelte';
+	import brands from '../brands.yaml?raw';
 
 	let svg: SVGElement;
 	let panzoomInstance: PanZoom;
@@ -30,82 +32,13 @@
 
 	let simulation: d3.Simulation<NodeDatum, LinkDatum>;
 
-	const entries = [
-		{
-			name: 'Suntree',
-			image: '/images/suntree.jpg',
-			province: 'bkk',
-			x: -100,
-			y: -100
-		},
-		{
-			name: 'Kilo Spirits',
-			image: '/images/kilo-spirits.jpg',
-			province: 'kbi',
-			x: -100,
-			y: -100
-		},
-		{
-			name: 'Gulve Fruit Wine',
-			image: '/images/gulve-fruit-wine.jpg',
-			province: 'cti',
-			x: -100,
-			y: -100
-		},
-		{
-			name: 'The Spirit of Chaiyaphum',
-			image: '/images/the-spirit-of-chaiyaphum.jpg',
-			province: 'cpm',
-			x: -100,
-			y: -100
-		},
-		{
-			name: 'Maa Jai Dum',
-			image: '/images/maajaidum.jpg',
-			province: 'cmi',
-			x: -100,
-			y: -100
-		},
-		{
-			name: 'Koyote Lumka',
-			image: '/images/koyote-lumka.jpg',
-			province: 'cmi',
-			x: -100,
-			y: -100
-		},
-		{
-			name: 'Asura',
-			image: '/images/asura.jpg',
-			province: 'cmi',
-			x: -100,
-			y: -100
-		},
-		{
-			name: 'Lanna Thai Spirit',
-			image: '/images/lanna-thai-spirit.jpg',
-			province: 'cmi',
-			x: -100,
-			y: -100
-		},
-		{
-			name: 'Saku',
-			image: '/images/saku.jpg',
-			province: 'nma',
-			x: -100,
-			y: -100
-		},
-		{
-			name: 'Callmepapa',
-			image: '/images/callmepapa.jpg',
-			province: 'nbi',
-			x: -100,
-			y: -100
-		}
-	].map((entry) => {
-		entry['x'] = mapData[entry.province as keyof typeof mapData].x;
-		entry['y'] = mapData[entry.province as keyof typeof mapData].y;
+	const brandsEntries = parse(brands) as Array<{ name: string; province: string; image: string }>;
 
-		return entry;
+	const entries = brandsEntries.map((entry) => {
+		const x = mapData[entry.province as keyof typeof mapData].x;
+		const y = mapData[entry.province as keyof typeof mapData].y;
+
+		return { ...entry, x, y };
 	});
 
 	let nodes: NodeDatum[] = [

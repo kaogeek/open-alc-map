@@ -1,0 +1,30 @@
+- name: Suntree
+  image: /images/suntree.jpg
+  province: bkk
+- name: Kilo Spirits
+  image: /images/kilo-spirits.jpg
+  province: kbi
+- name: Gulve Fruit Wine
+  image: /images/gulve-fruit-wine.jpg
+  province: cti
+- name: The Spirit of Chaiyaphum
+  image: /images/the-spirit-of-chaiyaphum.jpg
+  province: cpm
+- name: Maa Jai Dum
+  image: /images/maajaidum.jpg
+  province: cmi
+- name: Koyote Lumka
+  image: /images/koyote-lumka.jpg
+  province: cmi
+- name: Asura
+  image: /images/asura.jpg
+  province: cmi
+- name: Lanna Thai Spirit
+  image: /images/lanna-thai-spirit.jpg
+  province: cmi
+- name: Saku
+  image: /images/saku.jpg
+  province: nma
+- name: Callmepapa
+  image: /images/callmepapa.jpg
+  province: nbi
