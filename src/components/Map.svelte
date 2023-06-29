@@ -143,41 +143,31 @@
 			.on('tick', simulationUpdate);
 
 		panzoomInstance = panzoom(svg, {
-			onClick: (e) => {
-				e.preventDefault();
-
-				// Handle only path elements
-
-				const el = e.target as SVGPathElement;
-
-				if (el.tagName !== 'path') return;
-
-				// alert(`You clicked: ${el.getAttribute('name')}`);
-
-				// const bounds = el.getBoundingClientRect();
-				const bounds = el.getBBox();
-
-				const midX = bounds.x + bounds.width / 2;
-				const midY = bounds.y + bounds.height / 2;
-
-				console.log(midX, midY);
-			}
+			// onClick: (e) => {
+			// 	e.preventDefault();
+			// 	// Handle only path elements
+			// 	const el = e.target as SVGPathElement;
+			// 	if (el.tagName !== 'path') return;
+			// 	// const bounds = el.getBBox();
+			// 	// const midX = bounds.x + bounds.width / 2;
+			// 	// const midY = bounds.y + bounds.height / 2;
+			// 	// console.log(midX, midY);
+			// }
 		});
 
-		console.log(imgEl);
-		let data: Record<string, { x: number; y: number }> = {};
-		document.querySelectorAll<SVGPathElement>('#map path').forEach((path) => {
-			// Get middle point of each path
-			const bounds = path.getBBox();
-			const midX = bounds.x + bounds.width / 2;
-			const midY = bounds.y + bounds.height / 2;
+		// let data: Record<string, { x: number; y: number }> = {};
+		// document.querySelectorAll<SVGPathElement>('#map path').forEach((path) => {
+		// 	// Get middle point of each path
+		// 	const bounds = path.getBBox();
+		// 	const midX = bounds.x + bounds.width / 2;
+		// 	const midY = bounds.y + bounds.height / 2;
 
-			console.log(path.getAttribute('name'), midX, midY);
+		// 	console.log(path.getAttribute('name'), midX, midY);
 
-			// data[path.getAttribute('id')!] = { x: midX, y: midY, w: bounds.width, h: bounds.height };
-		});
+		// 	// data[path.getAttribute('id')!] = { x: midX, y: midY, w: bounds.width, h: bounds.height };
+		// });
 
-		console.log({ data });
+		// console.log({ data });
 
 		setTimeout(() => {
 			simulation.stop();

@@ -31,3 +31,75 @@
 - name: RaiYodDoy
   image: /images/raiyoddoy.jpg
   province: cmi
+- name: Shan
+  name_th: ฉาน
+  image: /images/placeholder.png
+  province: pre
+- name: Lung Nid ลุงนิด
+  name_th: ลุงนิด
+  image: /images/placeholder.png
+  province: cri
+- name: Ozzo
+  name_th: อ๊ดโซ๊ะ
+  image: /images/placeholder.png
+  province: lpn
+- name: Kirikhan
+  name_th: คีรีขาล
+  image: /images/placeholder.png
+  province: pyo
+- name: สุราขาวม้าแก้วมังกร
+  name_th:
+  image: /images/placeholder.png
+  province: utd
+- name: Mor
+  name_th: เหม๊าะ
+  image: /images/placeholder.png
+  province: nan
+- name: MORKA
+  name_th:
+  image: /images/placeholder.png
+  province: nan
+- name: Zebra Road
+  name_th: ทางม้าลาย
+  image: /images/placeholder.png
+  province: cmi
+- name: Assa Dong
+  name_th:
+  image: /images/placeholder.png
+  province: nan
+- name: Hopster Spirits
+  name_th:
+  image: /images/placeholder.png
+  province: cri
+- name: Chaeson
+  name_th: แจ้ซ้อน
+  image: /images/placeholder.png
+  province: lpg
+- name: Kosapan
+  name_th: โกษาปาน
+  image: /images/placeholder.png
+  province: nbi
+- name: Summer Beach
+  name_th:
+  image: /images/placeholder.png
+  province: cbi
+- name: White Shark
+  name_th: ฉลามขาว
+  image: /images/placeholder.png
+  province: cbi
+- name: Sangvein
+  name_th: สังเวียน
+  image: /images/placeholder.png
+  province: spb
+- name: Sod Chaeng
+  name_th: ซอดแจ้ง
+  image: /images/placeholder.png
+  province: ubn
+- name: Onson
+  name_th: ออนซอน
+  image: /images/placeholder.png
+  province: snk
+- name: Granmonte
+  name_th:
+  image: /images/placeholder.png
+  province: ubn
