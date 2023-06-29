@@ -159,6 +159,10 @@
 		});
 
 		console.log({ data });
+
+		setTimeout(() => {
+			simulation.stop();
+		}, 3000);
 	});
 
 	onDestroy(() => {
