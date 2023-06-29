@@ -132,7 +132,7 @@
 							}
 						}
 
-						return 30;
+						return 40;
 					})
 			)
 			.force('charge', d3.forceManyBody())
@@ -232,6 +232,18 @@
 						mask="url(#image-mask)"
 						on:click={() => handleBrandClick(node.id)}
 					/>
+					<!-- Add text under the image -->
+					<text
+						x={node.x}
+						y={node.y + 30}
+						text-anchor="middle"
+						font-size="8px"
+						fill="#444"
+						font-family="sans-serif"
+						font-weight="medium"
+					>
+						{node.id}
+					</text>
 				{/if}
 			{/each}
 
