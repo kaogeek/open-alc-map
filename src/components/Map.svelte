@@ -1,5 +1,12 @@
 <!-- https://github.com/VictorCazanave/svg-maps -->
 <!-- This map is based on the work of MapSVG (https://mapsvg.com). -->
+<script context="module" lang="ts">
+	export interface Brand {
+		name: string;
+		province: string;
+		image: string;
+	}
+</script>
 
 <script lang="ts">
 	import panzoom, { type PanZoom } from 'panzoom';
@@ -14,7 +21,8 @@
 	let svg: SVGElement;
 	let panzoomInstance: PanZoom;
 	let imgEl: SVGImageElement[] = [];
-	let provinces: Record<string, SVGCircleElement> = {};
+
+	export let onBrandClick: (brand: Brand) => void = () => {};
 
 	interface NodeDatum extends d3.SimulationNodeDatum {
 		id: string;
@@ -32,7 +40,7 @@
 
 	let simulation: d3.Simulation<NodeDatum, LinkDatum>;
 
-	const brandsEntries = parse(brands) as Array<{ name: string; province: string; image: string }>;
+	const brandsEntries = parse(brands) as Array<Brand>;
 
 	const entries = brandsEntries.map((entry) => {
 		const x = mapData[entry.province as keyof typeof mapData].x;
@@ -91,6 +99,17 @@
 		const entry = entries.find((entry) => entry.name === name);
 
 		return entry ? entry.image : '';
+	}
+
+	function handleBrandClick(name: string) {
+		const entry = entries.find((entry) => entry.name === name);
+
+		if (!entry) {
+			console.error(`Brand ${name} not found`);
+			return;
+		}
+
+		onBrandClick(entry);
 	}
 
 	onMount(() => {
@@ -201,13 +220,17 @@
 
 			{#each nodes as node}
 				{#if node.group == 'brand'}
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
 					<image
+						role="button"
+						tabindex="0"
 						href={getBrandImage(node.id)}
 						x={node.x - 20}
 						y={node.y - 20}
 						height="40"
 						width="40"
 						mask="url(#image-mask)"
+						on:click={() => handleBrandClick(node.id)}
 					/>
 				{/if}
 			{/each}
