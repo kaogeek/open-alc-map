@@ -28,3 +28,6 @@
 - name: Callmepapa
   image: /images/callmepapa.jpg
   province: nbi
+- name: RaiYodDoy
+  image: /images/raiyoddoy.jpg
+  province: cmi
