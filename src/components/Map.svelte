@@ -205,14 +205,16 @@
 						href={getBrandImage(node.id)}
 						x={node.x - 20}
 						y={node.y - 20}
-						width="40"
 						height="40"
+						width="40"
+						mask="url(#image-mask)"
 					/>
 				{/if}
-				<!-- <circle class="node" r="30" cx={node.x} cy={node.y}>
-					<title>{node.id}</title>
-				</circle> -->
 			{/each}
+
+			<mask id="image-mask" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
+				<circle cx="0.5" cy="0.5" r="0.5" fill="white" />
+			</mask>
 		</g>
 	</svg>
 </div>
